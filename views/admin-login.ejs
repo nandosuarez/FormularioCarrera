@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Acceso administrador</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Prata&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="page-admin-login">
+    <main class="auth-shell">
+      <section class="auth-card">
+        <p class="eyebrow">Panel administrativo</p>
+        <h1><%= eventName %></h1>
+        <p>Ingresa con tu usuario y contraseña para revisar inscripciones, validar pagos y aprobar participantes.</p>
+
+        <% if (flash) { %>
+          <div class="alert alert-<%= flash.type %>"><%= flash.message %></div>
+        <% } %>
+
+        <% if (error) { %>
+          <div class="alert alert-error"><%= error %></div>
+        <% } %>
+
+        <form class="auth-form" action="/admin/login" method="post">
+          <label class="field">
+            <span>Usuario</span>
+            <input type="text" name="username" required />
+          </label>
+
+          <label class="field">
+            <span>Contraseña</span>
+            <input type="password" name="password" required />
+          </label>
+
+          <button type="submit" class="primary-button">Entrar al panel</button>
+        </form>
+
+        <a class="hero-link" href="/">Volver al formulario</a>
+      </section>
+    </main>
+  </body>
+</html>

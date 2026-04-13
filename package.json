@@ -1,0 +1,35 @@
+{
+  "name": "ruta-del-acordeon-10k",
+  "version": "1.0.0",
+  "description": "Formulario web de inscripcion para la Carrera Atletica Ruta del Acordeon 10K - 2026.",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node --watch server.js",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "formulario",
+    "inscripcion",
+    "carrera",
+    "express"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20 <25"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-session": "^1.18.1",
+    "multer": "^2.0.2",
+    "nodemailer": "^7.0.3",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "pg-mem": "^3.0.5"
+  }
+}

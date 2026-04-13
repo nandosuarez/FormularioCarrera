@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= eventName %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Prata&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="page-home">
+    <main class="shell">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Formulario oficial de inscripción</p>
+          <h1><%= eventName %></h1>
+          <p class="hero-text">
+            La carrera atlética Ruta del Acordeón 10K – 2026 es un evento deportivo de carácter nacional
+            que busca fomentar la actividad física, la integración comunitaria y el talento deportivo.
+          </p>
+          <p class="hero-text">
+            Diligencia correctamente tus datos. Esta información será utilizada para efectos logísticos,
+            de seguridad, validación del pago y contacto oficial.
+          </p>
+          <div class="hero-note">
+            <strong>Importante:</strong> al enviar este formulario aceptas los términos, condiciones y
+            la cláusula de responsabilidad del evento.
+          </div>
+        </div>
+
+        <div class="hero-card">
+          <div class="hero-card-item">
+            <span>Modalidad</span>
+            <strong>Competitiva y Recreativa</strong>
+          </div>
+          <div class="hero-card-item">
+            <span>Adjunto obligatorio</span>
+            <strong>Comprobante de pago</strong>
+          </div>
+          <div class="hero-card-item">
+            <span>Estado inicial</span>
+            <strong>Pendiente de validación</strong>
+          </div>
+          <a class="hero-link" href="/admin">Acceso administrador</a>
+        </div>
+      </section>
+
+      <% if (flash) { %>
+        <div class="alert alert-<%= flash.type %>"><%= flash.message %></div>
+      <% } %>
+
+      <% if (Object.keys(errors).length > 0) { %>
+        <div class="alert alert-error">
+          <strong>Revisa los campos marcados.</strong>
+          Hay información pendiente o inválida en tu inscripción.
+        </div>
+      <% } %>
+
+      <form class="form-card" action="/inscripcion" method="post" enctype="multipart/form-data">
+        <section class="form-section">
+          <div class="section-heading">
+            <h2>Datos personales</h2>
+          </div>
+
+          <div class="grid grid-2">
+            <label class="field field-full">
+              <span>Nombres y apellidos completos *</span>
+              <input type="text" name="fullName" required value="<%= values.fullName || '' %>" />
+              <% if (errors.fullName) { %><small class="error-text"><%= errors.fullName %></small><% } %>
+            </label>
+
+            <label class="field">
+              <span>Tipo de documento *</span>
+              <select name="documentType" required>
+                <option value="">Selecciona una opción</option>
+                <% documentTypes.forEach((documentType) => { %>
+                  <option value="<%= documentType.value %>" <%= values.documentType === documentType.value ? 'selected' : '' %>>
+                    <%= documentType.label %>
+                  </option>
+                <% }) %>
+              </select>
+              <% if (errors.documentType) { %><small class="error-text"><%= errors.documentType %></small><% } %>
+            </label>
+
+            <label class="field">
+              <span>Número de documento *</span>
+              <input type="text" name="documentNumber" required value="<%= values.documentNumber || '' %>" />
+              <% if (errors.documentNumber) { %><small class="error-text"><%= errors.documentNumber %></small><% } %>
+            </label>
+
+            <label class="field">
+              <span>Fecha de nacimiento *</span>
+              <input type="date" name="birthDate" max="<%= todayDate %>" required value="<%= values.birthDate || '' %>" />
+              <% if (errors.birthDate) { %><small class="error-text"><%= errors.birthDate %></small><% } %>
+            </label>
+
+            <label class="field">
+              <span>Edad *</span>
+              <input type="number" name="age" value="<%= values.age || '' %>" readonly />
+            </label>
+
+            <div class="field">
+              <span>Sexo *</span>
+              <div class="radio-grid">
+                <% sexOptions.forEach((sex) => { %>
+                  <label class="choice-card">
+                    <input type="radio" name="sex" value="<%= sex.value %>" <%= values.sex === sex.value ? 'checked' : '' %> required />
+                    <span><%= sex.label %></span>
+                  </label>
+                <% }) %>
+              </div>
+              <% if (errors.sex) { %><small class="error-text"><%= errors.sex %></small><% } %>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="section-heading">
+            <h2>Información de contacto</h2>
+          </div>
+
+          <div class="grid grid-2">
+            <label class="field">
+              <span>Número de celular *</span>
+              <input type="tel" name="phone" required value="<%= values.phone || '' %>" />
+              <% if (errors.phone) { %><small class="error-text"><%= errors.phone %></small><% } %>
+            </label>
+
+            <label class="field">
+              <span>Correo electrónico *</span>
+              <input type="email" name="email" required value="<%= values.email || '' %>" />
+              <% if (errors.email) { %><small class="error-text"><%= errors.email %></small><% } %>
+            </label>
+
+            <label class="field field-full">
+              <span>Dirección de residencia *</span>
+              <input type="text" name="address" required value="<%= values.address || '' %>" />
+              <% if (errors.address) { %><small class="error-text"><%= errors.address %></small><% } %>
+            </label>
+
+            <label class="field">
+              <span>Ciudad o municipio *</span>
+              <input type="text" name="city" required value="<%= values.city || '' %>" />
+              <% if (errors.city) { %><small class="error-text"><%= errors.city %></small><% } %>
+            </label>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="section-heading">
+            <h2>Información deportiva</h2>
+          </div>
+
+          <div class="field">
+            <span>Tipo de participación *</span>
+            <div class="radio-grid">
+              <% participationTypes.forEach((item) => { %>
+                <label class="choice-card choice-card-wide">
+                  <input
+                    type="radio"
+                    name="participationType"
+                    value="<%= item.value %>"
+                    <%= values.participationType === item.value ? 'checked' : '' %>
+                    required
+                  />
+                  <span>
+                    <strong><%= item.title %></strong>
+                    <small><%= item.description %></small>
+                  </span>
+                </label>
+              <% }) %>
+            </div>
+            <% if (errors.participationType) { %><small class="error-text"><%= errors.participationType %></small><% } %>
+          </div>
+
+          <div class="field">
+            <span>Categoría *</span>
+            <div class="category-groups">
+              <% groupedCategories.forEach((group) => { %>
+                <div class="category-group" data-category-group="<%= group.title %>">
+                  <h3><%= group.title %></h3>
+                  <div class="radio-grid">
+                    <% group.categories.forEach((category) => { %>
+                      <label
+                        class="choice-card category-card"
+                        data-participation-type="<%= category.participationType %>"
+                        data-sex="<%= category.sex %>"
+                      >
+                        <input
+                          type="radio"
+                          name="category"
+                          value="<%= category.value %>"
+                          <%= values.category === category.value ? 'checked' : '' %>
+                          required
+                        />
+                        <span><%= category.label %></span>
+                      </label>
+                    <% }) %>
+                  </div>
+                </div>
+              <% }) %>
+            </div>
+            <% if (errors.category) { %><small class="error-text"><%= errors.category %></small><% } %>
+          </div>
+
+          <div class="grid grid-2">
+            <label class="field">
+              <span>Grupo sanguíneo *</span>
+              <input type="text" name="bloodType" required value="<%= values.bloodType || '' %>" />
+              <% if (errors.bloodType) { %><small class="error-text"><%= errors.bloodType %></small><% } %>
+            </label>
+
+            <label class="field">
+              <span>EPS o seguro médico *</span>
+              <input type="text" name="insurance" required value="<%= values.insurance || '' %>" />
+              <% if (errors.insurance) { %><small class="error-text"><%= errors.insurance %></small><% } %>
+            </label>
+
+            <div class="field">
+              <span>¿Presenta alguna condición médica? *</span>
+              <div class="radio-grid">
+                <% [{ value: 'si', label: 'Sí' }, { value: 'no', label: 'No' }].forEach((option) => { %>
+                  <label class="choice-card">
+                    <input
+                      type="radio"
+                      name="medicalCondition"
+                      value="<%= option.value %>"
+                      <%= (values.medicalCondition || 'no') === option.value ? 'checked' : '' %>
+                      required
+                    />
+                    <span><%= option.label %></span>
+                  </label>
+                <% }) %>
+              </div>
+              <% if (errors.medicalCondition) { %><small class="error-text"><%= errors.medicalCondition %></small><% } %>
+            </div>
+
+            <label class="field field-full conditional-field <%= (values.medicalCondition || 'no') === 'si' ? '' : 'is-hidden' %>" data-conditional="medicalDetails">
+              <span>Si respondiste “Sí”, ¿cuál? *</span>
+              <textarea name="medicalDetails" rows="4"><%= values.medicalDetails || '' %></textarea>
+              <% if (errors.medicalDetails) { %><small class="error-text"><%= errors.medicalDetails %></small><% } %>
+            </label>
+
+            <div class="field">
+              <span>¿Ha participado en carreras anteriormente? *</span>
+              <div class="radio-grid">
+                <% [{ value: 'si', label: 'Sí' }, { value: 'no', label: 'No' }].forEach((option) => { %>
+                  <label class="choice-card">
+                    <input
+                      type="radio"
+                      name="priorRace"
+                      value="<%= option.value %>"
+                      <%= (values.priorRace || 'no') === option.value ? 'checked' : '' %>
+                      required
+                    />
+                    <span><%= option.label %></span>
+                  </label>
+                <% }) %>
+              </div>
+              <% if (errors.priorRace) { %><small class="error-text"><%= errors.priorRace %></small><% } %>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="section-heading">
+            <h2>Contacto de emergencia</h2>
+          </div>
+
+          <div class="grid grid-2">
+            <label class="field">
+              <span>Nombre completo *</span>
+              <input type="text" name="emergencyName" required value="<%= values.emergencyName || '' %>" />
+              <% if (errors.emergencyName) { %><small class="error-text"><%= errors.emergencyName %></small><% } %>
+            </label>
+
+            <label class="field">
+              <span>Parentesco *</span>
+              <input type="text" name="emergencyRelationship" required value="<%= values.emergencyRelationship || '' %>" />
+              <% if (errors.emergencyRelationship) { %><small class="error-text"><%= errors.emergencyRelationship %></small><% } %>
+            </label>
+
+            <label class="field">
+              <span>Número de contacto *</span>
+              <input type="tel" name="emergencyPhone" required value="<%= values.emergencyPhone || '' %>" />
+              <% if (errors.emergencyPhone) { %><small class="error-text"><%= errors.emergencyPhone %></small><% } %>
+            </label>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="section-heading">
+            <h2>Información del evento</h2>
+          </div>
+
+          <div class="grid grid-2">
+            <div class="field">
+              <span>Talla de camiseta *</span>
+              <div class="radio-grid compact-grid">
+                <% shirtSizes.forEach((size) => { %>
+                  <label class="choice-card">
+                    <input type="radio" name="shirtSize" value="<%= size %>" <%= values.shirtSize === size ? 'checked' : '' %> required />
+                    <span><%= size %></span>
+                  </label>
+                <% }) %>
+              </div>
+              <% if (errors.shirtSize) { %><small class="error-text"><%= errors.shirtSize %></small><% } %>
+            </div>
+
+            <label class="field">
+              <span>Adjuntar comprobante de pago *</span>
+              <input type="file" name="paymentReceipt" accept=".pdf,.jpg,.jpeg,.png" required />
+              <small>Formatos permitidos: PDF, JPG, PNG. Tamaño máximo: 5 MB.</small>
+              <% if (errors.paymentReceipt) { %><small class="error-text"><%= errors.paymentReceipt %></small><% } %>
+            </label>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="section-heading">
+            <h2>Términos y condiciones</h2>
+          </div>
+
+          <div class="terms-box">
+            <h3>Cláusula de responsabilidad</h3>
+            <p>
+              Declaro que participo en la carrera Ruta del Acordeón 10K – 2026 de manera voluntaria y
+              bajo mi propia responsabilidad, manifestando que me encuentro en condiciones físicas,
+              médicas y de salud adecuadas para la práctica de actividad deportiva.
+            </p>
+            <p>
+              Exonero de toda responsabilidad a los organizadores del evento, patrocinadores, entidades
+              de apoyo, voluntarios y cualquier persona vinculada a la realización de la carrera, por
+              accidentes, lesiones, daños físicos, materiales o cualquier eventualidad que pueda ocurrir
+              antes, durante o después de la competencia.
+            </p>
+            <p>
+              Asumo plenamente los riesgos inherentes a la actividad deportiva y autorizo la atención
+              médica en caso de emergencia.
+            </p>
+          </div>
+
+          <label class="terms-check">
+            <input type="checkbox" name="termsAccepted" <%= values.termsAccepted ? 'checked' : '' %> required />
+            <span>Acepto los términos y condiciones del evento.</span>
+          </label>
+          <% if (errors.termsAccepted) { %><small class="error-text"><%= errors.termsAccepted %></small><% } %>
+        </section>
+
+        <div class="form-actions">
+          <button type="submit" class="primary-button">Enviar inscripción</button>
+          <p>Tu registro quedará pendiente hasta que el administrador valide la información y el pago.</p>
+        </div>
+      </form>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

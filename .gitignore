@@ -1,0 +1,8 @@
+node_modules/
+.env
+data/db.json
+data/.db.json.tmp
+uploads/*
+!uploads/.gitkeep
+!data/.gitkeep
+render-storage-test/

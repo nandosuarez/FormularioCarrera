@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel de inscripciones</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Prata&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="page-dashboard">
+    <main class="dashboard-shell">
+      <header class="dashboard-header">
+        <div>
+          <p class="eyebrow">Administrador conectado</p>
+          <h1>Inscripciones recibidas</h1>
+          <p>Usuario activo: <strong><%= currentAdmin %></strong></p>
+        </div>
+
+        <div class="dashboard-actions">
+          <a class="secondary-button" href="/">Ver formulario público</a>
+          <form action="/admin/logout" method="post">
+            <button type="submit" class="ghost-button">Salir</button>
+          </form>
+        </div>
+      </header>
+
+      <% if (flash) { %>
+        <div class="alert alert-<%= flash.type %>"><%= flash.message %></div>
+      <% } %>
+
+      <section class="summary-grid">
+        <article class="summary-card">
+          <span>Total</span>
+          <strong><%= summary.total %></strong>
+        </article>
+        <article class="summary-card">
+          <span>Pendientes</span>
+          <strong><%= summary.pending %></strong>
+        </article>
+        <article class="summary-card">
+          <span>Aprobadas</span>
+          <strong><%= summary.approved %></strong>
+        </article>
+        <article class="summary-card">
+          <span>Rechazadas</span>
+          <strong><%= summary.rejected %></strong>
+        </article>
+      </section>
+
+      <section class="filter-card">
+        <form class="filter-form" method="get" action="/admin/inscripciones">
+          <label class="field">
+            <span>Buscar por nombre, documento o correo</span>
+            <input type="text" name="q" value="<%= filters.query %>" />
+          </label>
+
+          <label class="field">
+            <span>Estado</span>
+            <select name="status">
+              <option value="all" <%= filters.status === 'all' ? 'selected' : '' %>>Todos</option>
+              <option value="pending" <%= filters.status === 'pending' ? 'selected' : '' %>>Pendiente</option>
+              <option value="approved" <%= filters.status === 'approved' ? 'selected' : '' %>>Aprobado</option>
+              <option value="rejected" <%= filters.status === 'rejected' ? 'selected' : '' %>>Rechazado</option>
+            </select>
+          </label>
+
+          <button type="submit" class="primary-button">Filtrar</button>
+        </form>
+      </section>
+
+      <section class="records-list">
+        <% if (!registrations.length) { %>
+          <article class="empty-state">
+            <h2>No hay resultados</h2>
+            <p>Aún no existen inscripciones para los filtros seleccionados.</p>
+          </article>
+        <% } %>
+
+        <% registrations.forEach((registration) => { %>
+          <article class="record-card">
+            <div class="record-top">
+              <div>
+                <p class="record-name"><%= registration.fullName %></p>
+                <p class="record-meta">
+                  <%= registration.documentType %> · <%= registration.documentNumber %> · <%= registration.email %>
+                </p>
+              </div>
+
+              <div class="record-badges">
+                <span class="status-badge status-<%= registration.status %>">
+                  <%= statusLabels[registration.status] %>
+                </span>
+                <span class="status-badge email-status-<%= registration.approvalEmailStatus %>">
+                  <%= emailStatusLabels[registration.approvalEmailStatus] %>
+                </span>
+              </div>
+            </div>
+
+            <div class="record-grid">
+              <div>
+                <span>Inscripción</span>
+                <strong><%= formatDateTime(registration.createdAt) %></strong>
+              </div>
+              <div>
+                <span>Participación</span>
+                <strong><%= registration.participationType %></strong>
+              </div>
+              <div>
+                <span>Categoría</span>
+                <strong><%= registration.category %></strong>
+              </div>
+              <div>
+                <span>Celular</span>
+                <strong><%= registration.phone %></strong>
+              </div>
+            </div>
+
+            <details class="record-details">
+              <summary>Ver información completa</summary>
+
+              <div class="details-grid">
+                <div class="detail-item"><span>Fecha de nacimiento</span><strong><%= formatDate(registration.birthDate) %></strong></div>
+                <div class="detail-item"><span>Edad</span><strong><%= registration.age %> años</strong></div>
+                <div class="detail-item"><span>Sexo</span><strong><%= registration.sex %></strong></div>
+                <div class="detail-item"><span>Grupo sanguíneo</span><strong><%= registration.bloodType %></strong></div>
+                <div class="detail-item"><span>EPS o seguro</span><strong><%= registration.insurance || 'No reportado' %></strong></div>
+                <div class="detail-item"><span>Ciudad o municipio</span><strong><%= registration.city || 'No reportado' %></strong></div>
+                <div class="detail-item"><span>Dirección</span><strong><%= registration.address || 'No reportada' %></strong></div>
+                <div class="detail-item"><span>Condición médica</span><strong><%= registration.medicalCondition %></strong></div>
+                <div class="detail-item"><span>Detalle condición</span><strong><%= registration.medicalDetails || 'No reportado' %></strong></div>
+                <div class="detail-item"><span>Experiencia previa</span><strong><%= registration.priorRace %></strong></div>
+                <div class="detail-item"><span>Contacto de emergencia</span><strong><%= registration.emergencyName %></strong></div>
+                <div class="detail-item"><span>Parentesco</span><strong><%= registration.emergencyRelationship || 'No reportado' %></strong></div>
+                <div class="detail-item"><span>Número de emergencia</span><strong><%= registration.emergencyPhone %></strong></div>
+                <div class="detail-item"><span>Talla de camiseta</span><strong><%= registration.shirtSize %></strong></div>
+                <div class="detail-item"><span>Correo de aprobación</span><strong><%= registration.approvalEmailSentAt ? formatDateTime(registration.approvalEmailSentAt) : 'No enviado' %></strong></div>
+                <div class="detail-item detail-item-wide">
+                  <span>Comprobante</span>
+                  <a class="inline-link" href="/admin/inscripciones/<%= registration.id %>/comprobante" target="_blank" rel="noreferrer">
+                    Abrir <%= registration.paymentReceipt.originalName %>
+                  </a>
+                </div>
+
+                <% if (registration.lastEmailError) { %>
+                  <div class="detail-item detail-item-wide">
+                    <span>Error de correo</span>
+                    <strong><%= registration.lastEmailError %></strong>
+                  </div>
+                <% } %>
+              </div>
+
+              <form class="decision-form" action="/admin/inscripciones/<%= registration.id %>/estado" method="post">
+                <label class="field field-full">
+                  <span>Observaciones internas</span>
+                  <textarea name="adminNotes" rows="3"><%= registration.adminNotes || '' %></textarea>
+                </label>
+
+                <div class="decision-actions">
+                  <button class="primary-button" type="submit" name="decision" value="approved">Aprobar y enviar correo</button>
+                  <button class="secondary-button" type="submit" name="decision" value="pending">Dejar pendiente</button>
+                  <button class="danger-button" type="submit" name="decision" value="rejected">Rechazar</button>
+                </div>
+              </form>
+
+              <% if (registration.status === 'approved') { %>
+                <form class="resend-form" action="/admin/inscripciones/<%= registration.id %>/reenviar-correo" method="post">
+                  <button type="submit" class="ghost-button">Reenviar correo de aprobación</button>
+                </form>
+              <% } %>
+            </details>
+          </article>
+        <% }) %>
+      </section>
+    </main>
+  </body>
+</html>
