@@ -20,6 +20,7 @@
 body {
   margin: 0;
   font-family: "Outfit", sans-serif;
+  -webkit-text-size-adjust: 100%;
   background:
     radial-gradient(circle at top left, rgba(215, 166, 59, 0.16), transparent 28%),
     radial-gradient(circle at top right, rgba(198, 93, 47, 0.12), transparent 26%),
@@ -191,6 +192,7 @@ a {
 
 .field > span {
   font-weight: 600;
+  line-height: 1.35;
 }
 
 input,
@@ -204,12 +206,23 @@ input,
 select,
 textarea {
   width: 100%;
+  font-size: 16px;
   border: 1px solid rgba(30, 37, 48, 0.15);
   background: rgba(255, 255, 255, 0.82);
   border-radius: 16px;
   padding: 14px 16px;
+  min-height: 54px;
   color: var(--ink);
   transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+textarea {
+  min-height: 132px;
+  resize: vertical;
+}
+
+input[type="file"] {
+  padding: 12px 14px;
 }
 
 input:focus,
@@ -267,6 +280,7 @@ small {
 .choice-card span {
   display: grid;
   gap: 3px;
+  width: 100%;
 }
 
 .choice-card small {
@@ -333,6 +347,11 @@ small {
   align-items: center;
   padding: 26px;
   flex-wrap: wrap;
+}
+
+.form-actions p {
+  margin: 0;
+  max-width: 36rem;
 }
 
 .primary-button,
@@ -583,12 +602,21 @@ small {
 @media (max-width: 720px) {
   .shell,
   .dashboard-shell {
-    width: min(100% - 20px, 1120px);
+    width: min(100% - 16px, 1120px);
+    padding: 18px 0 32px;
   }
 
-  .grid-2,
-  .compact-grid {
+  .grid-2 {
     grid-template-columns: 1fr;
+  }
+
+  .compact-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hero {
+    gap: 16px;
+    margin-bottom: 18px;
   }
 
   .hero-copy,
@@ -596,7 +624,57 @@ small {
   .form-section,
   .record-card,
   .auth-card {
-    padding: 22px;
+    padding: 20px;
+  }
+
+  .hero-copy::after {
+    display: none;
+  }
+
+  .hero h1 {
+    margin: 8px 0 12px;
+    font-size: clamp(2rem, 8.6vw, 2.9rem);
+  }
+
+  .hero-text,
+  .hero-note,
+  .terms-box,
+  .form-actions p {
+    line-height: 1.58;
+  }
+
+  .form-card {
+    padding: 10px;
+  }
+
+  .form-section {
+    padding: 20px 18px;
+  }
+
+  .section-heading h2 {
+    margin: 4px 0 16px;
+    font-size: 1.35rem;
+  }
+
+  .grid,
+  .radio-grid,
+  .category-groups,
+  .decision-form {
+    gap: 14px;
+  }
+
+  .choice-card {
+    min-height: 64px;
+    padding: 14px;
+    border-radius: 16px;
+  }
+
+  .choice-card-wide {
+    min-height: 74px;
+  }
+
+  .category-group {
+    padding: 16px;
   }
 
   .form-actions,
@@ -611,5 +689,98 @@ small {
   .danger-button,
   .ghost-button {
     width: 100%;
+    min-height: 52px;
+  }
+
+  .form-actions {
+    padding: 20px 18px;
+  }
+
+  .terms-check {
+    gap: 10px;
+  }
+
+  .terms-check input {
+    flex: 0 0 auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .shell,
+  .dashboard-shell {
+    width: min(100% - 12px, 1120px);
+    padding: 12px 0 26px;
+  }
+
+  .hero-copy,
+  .hero-card,
+  .form-section,
+  .record-card,
+  .auth-card,
+  .summary-card,
+  .filter-card,
+  .empty-state {
+    border-radius: 20px;
+  }
+
+  .hero-card {
+    padding: 16px;
+    gap: 14px;
+  }
+
+  .eyebrow,
+  .hero-card-item span,
+  .section-heading span {
+    font-size: 0.74rem;
+    letter-spacing: 0.12em;
+  }
+
+  .hero h1 {
+    font-size: clamp(1.85rem, 9vw, 2.45rem);
+  }
+
+  .hero-text {
+    font-size: 0.97rem;
+  }
+
+  .alert,
+  .hero-note,
+  .terms-box {
+    padding: 14px 15px;
+    border-radius: 16px;
+  }
+
+  .form-card {
+    padding: 8px;
+  }
+
+  .form-section,
+  .form-actions {
+    padding: 18px 14px;
+  }
+
+  .section-heading h2 {
+    font-size: 1.22rem;
+  }
+
+  .radio-grid,
+  .compact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .choice-card,
+  .choice-card-wide {
+    min-height: 60px;
+    padding: 13px 14px;
+  }
+
+  input,
+  select,
+  textarea,
+  .primary-button,
+  .secondary-button,
+  .danger-button,
+  .ghost-button {
+    border-radius: 14px;
   }
 }

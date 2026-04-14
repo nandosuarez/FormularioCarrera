@@ -69,7 +69,14 @@
           <div class="grid grid-2">
             <label class="field field-full">
               <span>Nombres y apellidos completos *</span>
-              <input type="text" name="fullName" required value="<%= values.fullName || '' %>" />
+              <input
+                type="text"
+                name="fullName"
+                required
+                autocomplete="name"
+                autocapitalize="words"
+                value="<%= values.fullName || '' %>"
+              />
               <% if (errors.fullName) { %><small class="error-text"><%= errors.fullName %></small><% } %>
             </label>
 
@@ -88,7 +95,14 @@
 
             <label class="field">
               <span>Número de documento *</span>
-              <input type="text" name="documentNumber" required value="<%= values.documentNumber || '' %>" />
+              <input
+                type="text"
+                name="documentNumber"
+                required
+                inputmode="numeric"
+                autocomplete="off"
+                value="<%= values.documentNumber || '' %>"
+              />
               <% if (errors.documentNumber) { %><small class="error-text"><%= errors.documentNumber %></small><% } %>
             </label>
 
@@ -126,25 +140,46 @@
           <div class="grid grid-2">
             <label class="field">
               <span>Número de celular *</span>
-              <input type="tel" name="phone" required value="<%= values.phone || '' %>" />
+              <input
+                type="tel"
+                name="phone"
+                required
+                inputmode="tel"
+                autocomplete="tel"
+                value="<%= values.phone || '' %>"
+              />
               <% if (errors.phone) { %><small class="error-text"><%= errors.phone %></small><% } %>
             </label>
 
             <label class="field">
               <span>Correo electrónico *</span>
-              <input type="email" name="email" required value="<%= values.email || '' %>" />
+              <input type="email" name="email" required autocomplete="email" value="<%= values.email || '' %>" />
               <% if (errors.email) { %><small class="error-text"><%= errors.email %></small><% } %>
             </label>
 
             <label class="field field-full">
               <span>Dirección de residencia *</span>
-              <input type="text" name="address" required value="<%= values.address || '' %>" />
+              <input
+                type="text"
+                name="address"
+                required
+                autocomplete="street-address"
+                autocapitalize="words"
+                value="<%= values.address || '' %>"
+              />
               <% if (errors.address) { %><small class="error-text"><%= errors.address %></small><% } %>
             </label>
 
             <label class="field">
               <span>Ciudad o municipio *</span>
-              <input type="text" name="city" required value="<%= values.city || '' %>" />
+              <input
+                type="text"
+                name="city"
+                required
+                autocomplete="address-level2"
+                autocapitalize="words"
+                value="<%= values.city || '' %>"
+              />
               <% if (errors.city) { %><small class="error-text"><%= errors.city %></small><% } %>
             </label>
           </div>
@@ -210,13 +245,20 @@
           <div class="grid grid-2">
             <label class="field">
               <span>Grupo sanguíneo *</span>
-              <input type="text" name="bloodType" required value="<%= values.bloodType || '' %>" />
+              <input type="text" name="bloodType" required autocapitalize="characters" value="<%= values.bloodType || '' %>" />
               <% if (errors.bloodType) { %><small class="error-text"><%= errors.bloodType %></small><% } %>
             </label>
 
             <label class="field">
               <span>EPS o seguro médico *</span>
-              <input type="text" name="insurance" required value="<%= values.insurance || '' %>" />
+              <input
+                type="text"
+                name="insurance"
+                required
+                autocomplete="organization"
+                autocapitalize="words"
+                value="<%= values.insurance || '' %>"
+              />
               <% if (errors.insurance) { %><small class="error-text"><%= errors.insurance %></small><% } %>
             </label>
 
@@ -274,19 +316,39 @@
           <div class="grid grid-2">
             <label class="field">
               <span>Nombre completo *</span>
-              <input type="text" name="emergencyName" required value="<%= values.emergencyName || '' %>" />
+              <input
+                type="text"
+                name="emergencyName"
+                required
+                autocomplete="name"
+                autocapitalize="words"
+                value="<%= values.emergencyName || '' %>"
+              />
               <% if (errors.emergencyName) { %><small class="error-text"><%= errors.emergencyName %></small><% } %>
             </label>
 
             <label class="field">
               <span>Parentesco *</span>
-              <input type="text" name="emergencyRelationship" required value="<%= values.emergencyRelationship || '' %>" />
+              <input
+                type="text"
+                name="emergencyRelationship"
+                required
+                autocapitalize="words"
+                value="<%= values.emergencyRelationship || '' %>"
+              />
               <% if (errors.emergencyRelationship) { %><small class="error-text"><%= errors.emergencyRelationship %></small><% } %>
             </label>
 
             <label class="field">
               <span>Número de contacto *</span>
-              <input type="tel" name="emergencyPhone" required value="<%= values.emergencyPhone || '' %>" />
+              <input
+                type="tel"
+                name="emergencyPhone"
+                required
+                inputmode="tel"
+                autocomplete="tel"
+                value="<%= values.emergencyPhone || '' %>"
+              />
               <% if (errors.emergencyPhone) { %><small class="error-text"><%= errors.emergencyPhone %></small><% } %>
             </label>
           </div>
