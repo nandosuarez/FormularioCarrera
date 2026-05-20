@@ -397,6 +397,10 @@
             <div class="payment-copy">
               <span class="payment-eyebrow">Pago de inscripcion</span>
               <h3>Realiza el pago antes de enviar tu registro</h3>
+              <div class="payment-amount">
+                <span>Valor de la inscripcion</span>
+                <strong>$150.000 COP</strong>
+              </div>
               <p>
                 Usa el codigo QR oficial para hacer el pago de la inscripcion. Cuando termines,
                 adjunta el comprobante en este mismo formulario para que el equipo pueda validarlo.
@@ -445,6 +449,7 @@
             <label class="field">
               <span>Adjuntar comprobante de pago *</span>
               <input type="file" name="paymentReceipt" accept=".pdf,.jpg,.jpeg,.png" required />
+              <small>Valor a pagar: $150.000 COP.</small>
               <small>Formatos permitidos: PDF, JPG, PNG. Tamaño máximo: 5 MB.</small>
               <% if (errors.paymentReceipt) { %><small class="error-text"><%= errors.paymentReceipt %></small><% } %>
             </label>
