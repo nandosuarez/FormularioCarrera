@@ -235,8 +235,8 @@ a {
 .dashboard-header h1 {
   margin: 10px 0 14px;
   font-family: "Prata", serif;
-  font-size: clamp(2rem, 4.1vw, 3.35rem);
-  line-height: 1.02;
+  font-size: clamp(1.55rem, 2.7vw, 2.55rem);
+  line-height: 1;
 }
 
 .hero-text,
@@ -254,28 +254,29 @@ a {
 
 .hero-title-row {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: flex-end;
-  gap: 10px 14px;
+  gap: 10px;
   margin: 8px 0 14px;
+  white-space: nowrap;
 }
 
 .hero-copy h1 {
   margin: 0;
   max-width: none;
-  text-wrap: pretty;
+  white-space: nowrap;
 }
 
 .hero-year {
   display: inline-flex;
   align-items: center;
-  min-height: 48px;
-  padding: 8px 16px;
+  min-height: 38px;
+  padding: 6px 12px;
   border-radius: 999px;
   background: rgba(185, 255, 0, 0.14);
   border: 1px solid rgba(185, 255, 0, 0.22);
   color: #f4ffd5;
-  font-size: clamp(1.15rem, 2vw, 1.55rem);
+  font-size: clamp(0.92rem, 1.3vw, 1.15rem);
   font-weight: 700;
   line-height: 1;
 }
@@ -931,8 +932,10 @@ small {
   }
 
   .hero-title-row {
+    flex-wrap: wrap;
     gap: 8px 10px;
     margin: 8px 0 12px;
+    white-space: normal;
   }
 
   .hero-year {
@@ -1080,7 +1083,9 @@ small {
   }
 
   .hero-title-row {
+    flex-wrap: wrap;
     gap: 8px;
+    white-space: normal;
   }
 
   .hero-year {
