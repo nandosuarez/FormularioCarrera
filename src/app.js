@@ -117,7 +117,29 @@ async function removeUploadedFile(file) {
   await fs.unlink(file.path).catch(() => {});
 }
 
+function getEventPresentation() {
+  const configuredName = (process.env.EVENT_NAME || "Ruta del Acordeon 10K 2026").trim();
+  const detectedYear = configuredName.match(/\b(20\d{2})\b/)?.[1] || "2026";
+  const heroYear = (process.env.EVENT_YEAR || detectedYear).trim();
+  let heroTitle = (process.env.EVENT_DISPLAY_NAME || configuredName)
+    .replace(/^Carrera\s+Atletica\s+/i, "")
+    .replace(new RegExp(`\\s*-?\\s*${heroYear}\\b`, "i"), "")
+    .trim();
+
+  if (!heroTitle) {
+    heroTitle = "Ruta del Acordeon 10K";
+  }
+
+  return {
+    eventName: configuredName,
+    heroTitle,
+    heroYear
+  };
+}
+
 function renderHome(res, { errors = {}, values = {}, status = 200 } = {}) {
+  const eventPresentation = getEventPresentation();
+
   return res.status(status).render("home", {
     errors,
     values,
@@ -127,6 +149,9 @@ function renderHome(res, { errors = {}, values = {}, status = 200 } = {}) {
     groupedCategories,
     shirtSizes: SHIRT_SIZES,
     eventName: process.env.EVENT_NAME || "Carrera Atlética Ruta del Acordeón 10K - 2026",
+    eventName: eventPresentation.eventName,
+    heroTitle: eventPresentation.heroTitle,
+    heroYear: eventPresentation.heroYear,
     todayDate: new Date().toISOString().split("T")[0]
   });
 }
