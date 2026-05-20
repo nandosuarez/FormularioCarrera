@@ -310,6 +310,62 @@ a {
   border-top: 4px solid rgba(185, 255, 0, 0.72);
 }
 
+.payment-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.88fr);
+  gap: 18px;
+  margin-bottom: 24px;
+  padding: 22px;
+  border-radius: 24px;
+  border: 1px solid rgba(185, 255, 0, 0.18);
+  background:
+    linear-gradient(145deg, rgba(11, 24, 12, 0.96), rgba(24, 55, 28, 0.92)),
+    rgba(18, 32, 20, 0.94);
+  color: #f6fde9;
+  box-shadow: 0 20px 40px rgba(8, 22, 10, 0.18);
+}
+
+.payment-copy,
+.payment-actions {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.payment-eyebrow {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(226, 255, 152, 0.84);
+}
+
+.payment-panel h3 {
+  margin: 0;
+  font-size: clamp(1.3rem, 2vw, 1.7rem);
+  line-height: 1.15;
+}
+
+.payment-panel p,
+.payment-help {
+  margin: 0;
+  color: rgba(241, 247, 234, 0.84);
+  line-height: 1.65;
+}
+
+.payment-steps {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: grid;
+  gap: 8px;
+  color: rgba(248, 252, 242, 0.94);
+}
+
+.payment-button {
+  width: 100%;
+}
+
 .form-section {
   padding: 26px;
   border-bottom: 1px solid var(--line);
@@ -758,6 +814,10 @@ small {
   .hero-poster-card {
     min-height: 360px;
   }
+
+  .payment-panel {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 720px) {
@@ -832,6 +892,12 @@ small {
 
   .form-section {
     padding: 20px 18px;
+  }
+
+  .payment-panel {
+    margin-bottom: 18px;
+    padding: 18px;
+    border-radius: 20px;
   }
 
   .section-heading h2 {
@@ -994,6 +1060,10 @@ small {
 
   .hero-poster-copy strong {
     font-size: 1rem;
+  }
+
+  .payment-panel {
+    padding: 16px 14px;
   }
 
   .choice-card,
