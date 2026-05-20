@@ -1,7 +1,7 @@
 {
   "name": "ruta-del-acordeon-10k",
   "version": "1.0.0",
-  "description": "Formulario web de inscripcion para la Carrera Atletica Ruta del Acordeon 10K - 2026.",
+  "description": "Formulario web de inscripcion para Ruta del Acordeon 10K 2026.",
   "type": "module",
   "main": "server.js",
   "scripts": {

@@ -235,8 +235,8 @@ a {
 .dashboard-header h1 {
   margin: 10px 0 14px;
   font-family: "Prata", serif;
-  font-size: clamp(2.2rem, 5vw, 4rem);
-  line-height: 1.05;
+  font-size: clamp(2rem, 4.1vw, 3.35rem);
+  line-height: 1.02;
 }
 
 .hero-text,
@@ -250,6 +250,11 @@ a {
 
 .hero-copy .hero-text {
   color: rgba(241, 247, 234, 0.88);
+}
+
+.hero-copy h1 {
+  max-width: 12ch;
+  text-wrap: balance;
 }
 
 .hero-note,
