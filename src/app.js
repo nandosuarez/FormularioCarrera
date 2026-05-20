@@ -118,7 +118,9 @@ async function removeUploadedFile(file) {
 }
 
 function getEventPresentation() {
-  const configuredName = (process.env.EVENT_NAME || "Ruta del Acordeon 10K 2026").trim();
+  const configuredName = (process.env.EVENT_NAME || "Ruta del Acordeon 10 KM 2026")
+    .trim()
+    .replace(/\b10K\b/gi, "10 KM");
   const detectedYear = configuredName.match(/\b(20\d{2})\b/)?.[1] || "2026";
   const heroYear = (process.env.EVENT_YEAR || detectedYear).trim();
   let heroTitle = (process.env.EVENT_DISPLAY_NAME || configuredName)
@@ -127,7 +129,7 @@ function getEventPresentation() {
     .trim();
 
   if (!heroTitle) {
-    heroTitle = "Ruta del Acordeon 10K";
+    heroTitle = "Ruta del Acordeon 10 KM";
   }
 
   return {
