@@ -150,7 +150,6 @@ function renderHome(res, { errors = {}, values = {}, status = 200 } = {}) {
     participationTypes: PARTICIPATION_TYPES,
     groupedCategories,
     shirtSizes: SHIRT_SIZES,
-    eventName: process.env.EVENT_NAME || "Carrera Atlética Ruta del Acordeón 10K - 2026",
     eventName: eventPresentation.eventName,
     heroTitle: eventPresentation.heroTitle,
     heroYear: eventPresentation.heroYear,
@@ -159,9 +158,11 @@ function renderHome(res, { errors = {}, values = {}, status = 200 } = {}) {
 }
 
 function renderAdminLogin(res, { error = "", status = 200 } = {}) {
+  const eventPresentation = getEventPresentation();
+
   return res.status(status).render("admin-login", {
     error,
-    eventName: process.env.EVENT_NAME || "Ruta del Acordeón 10K - 2026"
+    eventName: eventPresentation.eventName
   });
 }
 

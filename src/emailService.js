@@ -32,7 +32,7 @@ function buildRaceDetails(registration) {
   const items = [
     {
       label: "Evento",
-      value: process.env.EVENT_NAME || "Carrera Atlética Ruta del Acordeón 10K - 2026"
+      value: process.env.EVENT_NAME || "Carrera Atlética Ruta del Acordeón 10 KM - 2026"
     },
     {
       label: "Fecha",
@@ -102,7 +102,7 @@ export async function sendApprovalEmail(registration) {
     await transport.transporter.sendMail({
       from: transport.from,
       to: registration.email,
-      subject: `Inscripción aprobada - ${process.env.EVENT_NAME || "Ruta del Acordeón 10K - 2026"}`,
+      subject: `Inscripción aprobada - ${process.env.EVENT_NAME || "Ruta del Acordeón 10 KM - 2026"}`,
       html,
       text
     });
