@@ -18,8 +18,8 @@ export const PARTICIPATION_TYPES = [
   },
   {
     value: "recreativa",
-    title: "Recreativa",
-    description: "Solo villanueveros"
+    title: "5 KM",
+    description: "Categoría abierta"
   }
 ];
 
@@ -96,13 +96,13 @@ export const CATEGORIES = [
   },
   {
     value: "recreativa_masculino",
-    label: "Recreativa Masculino (Solo Villanueveros)",
+    label: "5 KM Categoría abierta Masculino",
     participationType: "recreativa",
     sex: "masculino"
   },
   {
     value: "recreativa_femenino",
-    label: "Recreativa Femenino (Solo Villanueveros)",
+    label: "5 KM Categoría abierta Femenino",
     participationType: "recreativa",
     sex: "femenino"
   }

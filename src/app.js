@@ -63,7 +63,7 @@ const groupedCategories = [
     categories: CATEGORIES.filter((item) => item.participationType === "competitiva")
   },
   {
-    title: "Recreativa",
+    title: "5 KM Categoría abierta",
     categories: CATEGORIES.filter((item) => item.participationType === "recreativa")
   }
 ];
