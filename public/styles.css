@@ -576,6 +576,7 @@ small {
 }
 
 .conditional-field.is-hidden,
+.category-group.is-hidden,
 .category-card.is-hidden {
   display: none;
 }

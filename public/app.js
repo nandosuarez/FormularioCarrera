@@ -3,6 +3,7 @@ const ageInput = document.querySelector('input[name="age"]');
 const participationInputs = document.querySelectorAll('input[name="participationType"]');
 const sexInputs = document.querySelectorAll('input[name="sex"]');
 const categoryCards = document.querySelectorAll(".category-card");
+const categoryGroups = document.querySelectorAll(".category-group");
 const medicalInputs = document.querySelectorAll('input[name="medicalCondition"]');
 const medicalDetailsField = document.querySelector('[data-conditional="medicalDetails"]');
 const medicalDetailsTextarea = document.querySelector('textarea[name="medicalDetails"]');
@@ -45,6 +46,14 @@ function syncCategories() {
     if (!isVisible) {
       input.checked = false;
     }
+  });
+
+  categoryGroups.forEach((group) => {
+    const hasVisibleCategory = Array.from(group.querySelectorAll(".category-card")).some(
+      (card) => !card.classList.contains("is-hidden")
+    );
+
+    group.classList.toggle("is-hidden", !hasVisibleCategory);
   });
 }
 
