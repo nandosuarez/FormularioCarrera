@@ -59,7 +59,7 @@ const upload = multer({
 
 const groupedCategories = [
   {
-    title: "Competitiva",
+    title: "10 KM Competitiva",
     categories: CATEGORIES.filter((item) => item.participationType === "competitiva")
   },
   {

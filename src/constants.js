@@ -13,7 +13,7 @@ export const SEX_OPTIONS = [
 export const PARTICIPATION_TYPES = [
   {
     value: "competitiva",
-    title: "Competitiva",
+    title: "10 KM Competitiva",
     description: "Nivel nacional"
   },
   {
