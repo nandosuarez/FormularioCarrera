@@ -415,6 +415,23 @@ a {
   color: rgba(248, 252, 242, 0.94);
 }
 
+.payment-qr-link {
+  display: block;
+  overflow: hidden;
+  border-radius: 20px;
+  border: 1px solid rgba(185, 255, 0, 0.28);
+  background: #ffffff;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.22);
+}
+
+.payment-qr-image {
+  display: block;
+  width: 100%;
+  max-height: 440px;
+  object-fit: contain;
+  background: #ffffff;
+}
+
 .payment-button {
   width: 100%;
 }
