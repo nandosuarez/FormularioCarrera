@@ -463,7 +463,7 @@
               <span>Adjuntar comprobante de pago *</span>
               <input type="file" name="paymentReceipt" accept=".pdf,.jpg,.jpeg,.png" required />
               <small>Valor a pagar: $150.000 COP.</small>
-              <small>Formatos permitidos: PDF, JPG, PNG. Tamaño máximo: 5 MB.</small>
+              <small>Formatos permitidos: PDF, JPG, PNG. Tamaño máximo: <%= receiptMaxSizeMb %> MB.</small>
               <% if (errors.paymentReceipt) { %><small class="error-text"><%= errors.paymentReceipt %></small><% } %>
             </label>
           </div>

@@ -34,6 +34,11 @@ dotenv.config();
 const appRoot = process.cwd();
 const uploadDirectory = path.join(appRoot, "uploads");
 const uploadStorageMode = getUploadStorageMode();
+const receiptMaxSizeMb = Math.max(
+  Number.parseInt(process.env.RECEIPT_MAX_SIZE_MB || "15", 10) || 15,
+  1
+);
+const receiptMaxSizeBytes = receiptMaxSizeMb * 1024 * 1024;
 
 function buildStoredFileName(originalName) {
   const extension = path.extname(originalName).toLowerCase();
@@ -53,7 +58,7 @@ const storage =
 const upload = multer({
   storage,
   limits: {
-    fileSize: 5 * 1024 * 1024
+    fileSize: receiptMaxSizeBytes
   }
 });
 
@@ -153,6 +158,7 @@ function renderHome(res, { errors = {}, values = {}, status = 200 } = {}) {
     eventName: eventPresentation.eventName,
     heroTitle: eventPresentation.heroTitle,
     heroYear: eventPresentation.heroYear,
+    receiptMaxSizeMb,
     todayDate: new Date().toISOString().split("T")[0]
   });
 }
@@ -171,7 +177,7 @@ function uploadReceipt(req, res, next) {
     if (error) {
       req.uploadError =
         error.code === "LIMIT_FILE_SIZE"
-          ? "El comprobante no puede superar los 5 MB."
+          ? `El comprobante no puede superar los ${receiptMaxSizeMb} MB.`
           : error.message;
     }
     next();

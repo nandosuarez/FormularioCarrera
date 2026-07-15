@@ -93,6 +93,7 @@ El proyecto ya incluye un archivo `render.yaml` listo para crear el servicio.
 - `EVENT_LOCATION`
 - `EVENT_CONTACT_EMAIL`
 - `EVENT_CONTACT_PHONE`
+- `RECEIPT_MAX_SIZE_MB`
 - `SMTP_HOST`
 - `SMTP_USER`
 - `SMTP_PASS`
