@@ -73,6 +73,23 @@ const groupedCategories = [
   }
 ];
 
+const categoryOptions = CATEGORIES.map((category) => category.label);
+
+function buildApprovedCategorySummary(registrations) {
+  const countsByCategory = new Map(categoryOptions.map((category) => [category, 0]));
+
+  registrations.forEach((registration) => {
+    const category = registration.category || "Sin categoría";
+    countsByCategory.set(category, (countsByCategory.get(category) || 0) + 1);
+  });
+
+  return Array.from(countsByCategory.entries()).map(([category, total]) => ({
+    category,
+    total,
+    href: `/admin/inscripciones?status=approved&category=${encodeURIComponent(category)}`
+  }));
+}
+
 function setFlash(req, flash) {
   req.session.flash = flash;
 }
@@ -333,15 +350,22 @@ export async function createApp() {
   app.get("/admin/inscripciones", isAuthenticated, async (req, res) => {
     const status = req.query.status || "all";
     const query = (req.query.q || "").trim();
-    const [registrations, summary] = await Promise.all([
+    const category = (req.query.category || "").trim();
+    const [rawRegistrations, summary, approvedRegistrations] = await Promise.all([
       listRegistrations({ status, query }),
-      getRegistrationSummary()
+      getRegistrationSummary(),
+      listRegistrations({ status: "approved", query: "" })
     ]);
+    const registrations = category
+      ? rawRegistrations.filter((registration) => registration.category === category)
+      : rawRegistrations;
 
     res.render("admin-dashboard", {
       registrations,
       summary,
-      filters: { status, query },
+      approvedCategorySummary: buildApprovedCategorySummary(approvedRegistrations),
+      categoryOptions,
+      filters: { status, query, category },
       statusLabels: STATUS_LABELS,
       emailStatusLabels: EMAIL_STATUS_LABELS,
       formatDateTime,

@@ -53,6 +53,7 @@ a {
 .hero-card,
 .form-card,
 .filter-card,
+.category-board,
 .summary-card,
 .record-card,
 .auth-card,
@@ -727,6 +728,87 @@ small {
   font-size: 2rem;
 }
 
+.category-board {
+  padding: 22px;
+  margin-bottom: 18px;
+}
+
+.board-heading,
+.list-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.board-heading {
+  margin-bottom: 18px;
+}
+
+.board-heading h2,
+.list-heading h2 {
+  margin: 6px 0 0;
+  font-size: 1.45rem;
+}
+
+.category-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+}
+
+.category-summary-card {
+  display: grid;
+  gap: 8px;
+  min-height: 138px;
+  padding: 18px;
+  border-radius: 20px;
+  border: 1px solid rgba(20, 32, 24, 0.1);
+  background:
+    radial-gradient(circle at top right, rgba(185, 255, 0, 0.22), transparent 44%),
+    rgba(255, 255, 255, 0.72);
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.category-summary-card:hover,
+.category-summary-card.is-active {
+  transform: translateY(-2px);
+  border-color: rgba(36, 106, 74, 0.36);
+  box-shadow: 0 18px 38px rgba(8, 22, 10, 0.12);
+}
+
+.category-summary-card.is-active {
+  background:
+    linear-gradient(145deg, rgba(9, 37, 19, 0.96), rgba(29, 71, 34, 0.92)),
+    var(--accent-dark);
+  color: #f6fde9;
+}
+
+.category-summary-card.is-empty {
+  opacity: 0.68;
+}
+
+.category-summary-card span {
+  color: var(--muted);
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.category-summary-card.is-active span,
+.category-summary-card.is-active small {
+  color: rgba(246, 253, 233, 0.78);
+}
+
+.category-summary-card strong {
+  font-size: 2.35rem;
+  line-height: 1;
+}
+
+.category-summary-card small {
+  color: var(--muted);
+  font-weight: 700;
+}
+
 .filter-card {
   padding: 20px;
   margin-bottom: 18px;
@@ -734,9 +816,19 @@ small {
 
 .filter-form {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(180px, 0.9fr) auto;
+  grid-template-columns: minmax(0, 1.45fr) minmax(160px, 0.7fr) minmax(220px, 1fr) auto;
   gap: 16px;
   align-items: end;
+}
+
+.list-heading {
+  margin: 18px 0 14px;
+}
+
+.list-heading p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
 }
 
 .records-list {
@@ -867,6 +959,8 @@ small {
   .hero,
   .filter-form,
   .dashboard-header,
+  .board-heading,
+  .list-heading,
   .summary-grid,
   .record-grid,
   .details-grid {
@@ -921,6 +1015,7 @@ small {
   .hero-poster-card,
   .form-section,
   .record-card,
+  .category-board,
   .auth-card {
     padding: 20px;
   }
@@ -1070,6 +1165,7 @@ small {
   .form-section,
   .record-card,
   .auth-card,
+  .category-board,
   .summary-card,
   .filter-card,
   .empty-state {
@@ -1142,6 +1238,14 @@ small {
 
   .section-heading h2 {
     font-size: 1.22rem;
+  }
+
+  .category-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .category-summary-card {
+    min-height: 112px;
   }
 
   .radio-grid,

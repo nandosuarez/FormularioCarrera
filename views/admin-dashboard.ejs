@@ -52,6 +52,31 @@
         </article>
       </section>
 
+      <section class="category-board">
+        <div class="board-heading">
+          <div>
+            <p class="eyebrow">Aprobados por categoría</p>
+            <h2>Tablero de categorías</h2>
+          </div>
+          <% if (filters.category) { %>
+            <a class="ghost-button" href="/admin/inscripciones?status=approved">Ver todas las aprobadas</a>
+          <% } %>
+        </div>
+
+        <div class="category-summary-grid">
+          <% approvedCategorySummary.forEach((item) => { %>
+            <a
+              class="category-summary-card <%= filters.category === item.category ? 'is-active' : '' %> <%= item.total === 0 ? 'is-empty' : '' %>"
+              href="<%= item.href %>"
+            >
+              <span><%= item.category %></span>
+              <strong><%= item.total %></strong>
+              <small><%= item.total === 1 ? 'aprobado' : 'aprobados' %></small>
+            </a>
+          <% }) %>
+        </div>
+      </section>
+
       <section class="filter-card">
         <form class="filter-form" method="get" action="/admin/inscripciones">
           <label class="field">
@@ -69,8 +94,31 @@
             </select>
           </label>
 
+          <label class="field">
+            <span>Categoría</span>
+            <select name="category">
+              <option value="" <%= !filters.category ? 'selected' : '' %>>Todas</option>
+              <% categoryOptions.forEach((category) => { %>
+                <option value="<%= category %>" <%= filters.category === category ? 'selected' : '' %>>
+                  <%= category %>
+                </option>
+              <% }) %>
+            </select>
+          </label>
+
           <button type="submit" class="primary-button">Filtrar</button>
         </form>
+      </section>
+
+      <section class="list-heading">
+        <div>
+          <p class="eyebrow">Listado</p>
+          <h2><%= filters.category ? 'Personas en ' + filters.category : 'Personas inscritas' %></h2>
+        </div>
+        <p>
+          Mostrando <strong><%= registrations.length %></strong>
+          <%= registrations.length === 1 ? 'registro' : 'registros' %>
+        </p>
       </section>
 
       <section class="records-list">
