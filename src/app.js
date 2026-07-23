@@ -156,55 +156,235 @@ function formatExportDate(dateValue) {
   }).format(date);
 }
 
-function escapeCsvCell(value) {
-  const text = value === null || value === undefined ? "" : String(value);
-  return `"${text.replaceAll('"', '""')}"`;
+function escapeXml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&apos;");
 }
 
-function buildRegistrationsCsv(registrations) {
-  const columns = [
-    ["ID", (registration) => registration.id],
-    ["Fecha de inscripción", (registration) => formatExportDate(registration.createdAt)],
-    ["Estado", (registration) => STATUS_LABELS[registration.status] || registration.status],
-    [
-      "Estado correo",
-      (registration) =>
-        EMAIL_STATUS_LABELS[registration.approvalEmailStatus] || registration.approvalEmailStatus
-    ],
-    ["Nombre completo", (registration) => registration.fullName],
-    ["Tipo de documento", (registration) => registration.documentType],
-    ["Número de documento", (registration) => registration.documentNumber],
-    ["Fecha de nacimiento", (registration) => registration.birthDate],
-    ["Edad", (registration) => registration.age],
-    ["Sexo", (registration) => registration.sex],
-    ["Celular", (registration) => registration.phone],
-    ["Correo electrónico", (registration) => registration.email],
-    ["Dirección", (registration) => registration.address],
-    ["Ciudad", (registration) => registration.city],
-    ["Participación", (registration) => registration.participationType],
-    ["Categoría", (registration) => registration.category],
-    ["Grupo sanguíneo", (registration) => registration.bloodType],
-    ["EPS o seguro", (registration) => registration.insurance],
-    ["Condición médica", (registration) => registration.medicalCondition],
-    ["Detalle condición médica", (registration) => registration.medicalDetails],
-    ["Experiencia previa", (registration) => registration.priorRace],
-    ["Contacto emergencia", (registration) => registration.emergencyName],
-    ["Parentesco emergencia", (registration) => registration.emergencyRelationship],
-    ["Teléfono emergencia", (registration) => registration.emergencyPhone],
-    ["Talla camiseta", (registration) => registration.shirtSize],
-    ["Comprobante", (registration) => registration.paymentReceipt?.originalName],
-    ["Fecha aprobación", (registration) => formatExportDate(registration.approvedAt)],
-    ["Fecha correo aprobación", (registration) => formatExportDate(registration.approvalEmailSentAt)],
-    ["Observaciones internas", (registration) => registration.adminNotes],
-    ["Error de correo", (registration) => registration.lastEmailError]
+function getStatusLabel(status) {
+  return STATUS_LABELS[status] || status || "";
+}
+
+function getEmailStatusLabel(status) {
+  return EMAIL_STATUS_LABELS[status] || status || "";
+}
+
+function excelCell(value, style = "Default", type = "String") {
+  const dataType = type === "Number" && value !== "" && value !== null && value !== undefined
+    ? "Number"
+    : "String";
+
+  return `<Cell ss:StyleID="${style}"><Data ss:Type="${dataType}">${escapeXml(value)}</Data></Cell>`;
+}
+
+function excelRow(cells, style = "Default") {
+  return `<Row>${cells.map((cell) => excelCell(cell, style)).join("")}</Row>`;
+}
+
+function buildStatusSummary(registrations) {
+  return registrations.reduce(
+    (summary, registration) => {
+      summary.total += 1;
+      summary[registration.status] = (summary[registration.status] || 0) + 1;
+      return summary;
+    },
+    { total: 0, pending: 0, approved: 0, rejected: 0 }
+  );
+}
+
+function buildCategoryRows(registrations) {
+  const counts = new Map();
+
+  registrations.forEach((registration) => {
+    const category = registration.category || "Sin categoría";
+    counts.set(category, (counts.get(category) || 0) + 1);
+  });
+
+  return Array.from(counts.entries())
+    .sort(([categoryA], [categoryB]) => categoryA.localeCompare(categoryB, "es"))
+    .map(([category, total]) => [category, total]);
+}
+
+function buildExportColumns() {
+  return [
+    { label: "Estado", width: 92, value: (registration) => getStatusLabel(registration.status) },
+    {
+      label: "Correo aprobación",
+      width: 118,
+      value: (registration) => getEmailStatusLabel(registration.approvalEmailStatus)
+    },
+    { label: "Nombre completo", width: 210, value: (registration) => registration.fullName },
+    { label: "Documento", width: 118, value: (registration) => registration.documentNumber },
+    { label: "Tipo documento", width: 132, value: (registration) => registration.documentType },
+    { label: "Celular", width: 110, value: (registration) => registration.phone },
+    { label: "Correo electrónico", width: 190, value: (registration) => registration.email },
+    { label: "Participación", width: 150, value: (registration) => registration.participationType },
+    { label: "Categoría", width: 220, value: (registration) => registration.category },
+    { label: "Sexo", width: 90, value: (registration) => registration.sex },
+    { label: "Edad", width: 58, value: (registration) => registration.age, type: "Number" },
+    { label: "Fecha nacimiento", width: 120, value: (registration) => registration.birthDate },
+    { label: "Grupo sanguíneo", width: 108, value: (registration) => registration.bloodType },
+    { label: "EPS o seguro", width: 150, value: (registration) => registration.insurance },
+    { label: "Ciudad", width: 130, value: (registration) => registration.city },
+    { label: "Dirección", width: 190, value: (registration) => registration.address },
+    { label: "Condición médica", width: 125, value: (registration) => registration.medicalCondition },
+    {
+      label: "Detalle condición",
+      width: 190,
+      value: (registration) => registration.medicalDetails
+    },
+    { label: "Experiencia previa", width: 120, value: (registration) => registration.priorRace },
+    { label: "Contacto emergencia", width: 180, value: (registration) => registration.emergencyName },
+    {
+      label: "Parentesco",
+      width: 120,
+      value: (registration) => registration.emergencyRelationship
+    },
+    { label: "Teléfono emergencia", width: 132, value: (registration) => registration.emergencyPhone },
+    { label: "Talla", width: 62, value: (registration) => registration.shirtSize },
+    { label: "Inscripción", width: 135, value: (registration) => formatExportDate(registration.createdAt) },
+    { label: "Aprobación", width: 135, value: (registration) => formatExportDate(registration.approvedAt) },
+    {
+      label: "Correo enviado",
+      width: 135,
+      value: (registration) => formatExportDate(registration.approvalEmailSentAt)
+    },
+    { label: "Comprobante", width: 170, value: (registration) => registration.paymentReceipt?.originalName },
+    { label: "Observaciones", width: 220, value: (registration) => registration.adminNotes },
+    { label: "Error correo", width: 220, value: (registration) => registration.lastEmailError },
+    { label: "ID interno", width: 210, value: (registration) => registration.id }
+  ];
+}
+
+function buildExcelWorkbook(registrations, filters) {
+  const generatedAt = formatExportDate(new Date().toISOString());
+  const statusSummary = buildStatusSummary(registrations);
+  const categoryRows = buildCategoryRows(registrations);
+  const columns = buildExportColumns();
+  const filterRows = [
+    ["Estado", filters.status === "all" ? "Todos" : getStatusLabel(filters.status)],
+    ["Búsqueda", filters.query || "Sin filtro"],
+    ["Categoría", filters.category || "Todas"],
+    ["Generado", generatedAt]
   ];
 
-  const header = columns.map(([label]) => escapeCsvCell(label)).join(",");
-  const rows = registrations.map((registration) =>
-    columns.map(([, getter]) => escapeCsvCell(getter(registration))).join(",")
-  );
+  const summaryRows = [
+    ["Total exportado", statusSummary.total],
+    ["Pendientes", statusSummary.pending],
+    ["Aprobadas", statusSummary.approved],
+    ["Rechazadas", statusSummary.rejected]
+  ];
 
-  return `sep=,\r\n${[header, ...rows].join("\r\n")}`;
+  const summarySheetRows = [
+    `<Row ss:Height="30"><Cell ss:StyleID="Title" ss:MergeAcross="2"><Data ss:Type="String">Ruta del Acordeón - Resumen de inscripciones</Data></Cell></Row>`,
+    `<Row><Cell ss:StyleID="Subtitle" ss:MergeAcross="2"><Data ss:Type="String">Exportación administrativa para Excel</Data></Cell></Row>`,
+    `<Row />`,
+    excelRow(["Filtros aplicados", "Valor"], "Header"),
+    ...filterRows.map((row) => excelRow(row, "Default")),
+    `<Row />`,
+    excelRow(["Resumen", "Total"], "Header"),
+    ...summaryRows.map(([label, total]) =>
+      `<Row>${excelCell(label)}${excelCell(total, "Number", "Number")}</Row>`
+    ),
+    `<Row />`,
+    excelRow(["Categoría", "Total"], "Header"),
+    ...(categoryRows.length
+      ? categoryRows.map(([category, total]) =>
+          `<Row>${excelCell(category)}${excelCell(total, "Number", "Number")}</Row>`
+        )
+      : [excelRow(["Sin registros para los filtros seleccionados", "0"])])
+  ].join("");
+
+  const inscriptionSheetRows = [
+    `<Row ss:Height="30"><Cell ss:StyleID="Title" ss:MergeAcross="${columns.length - 1}"><Data ss:Type="String">Inscripciones Ruta del Acordeón</Data></Cell></Row>`,
+    `<Row><Cell ss:StyleID="Subtitle" ss:MergeAcross="${columns.length - 1}"><Data ss:Type="String">Registros exportados: ${statusSummary.total}</Data></Cell></Row>`,
+    `<Row />`,
+    `<Row>${columns.map((column) => excelCell(column.label, "Header")).join("")}</Row>`,
+    ...registrations.map(
+      (registration) =>
+        `<Row>${columns
+          .map((column) => excelCell(column.value(registration), column.type === "Number" ? "Number" : "Default", column.type))
+          .join("")}</Row>`
+    )
+  ].join("");
+
+  const columnDefinitions = columns
+    .map((column) => `<Column ss:AutoFitWidth="0" ss:Width="${column.width}" />`)
+    .join("");
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook
+  xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:x="urn:schemas-microsoft-com:office:excel"
+  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:html="http://www.w3.org/TR/REC-html40">
+  <Styles>
+    <Style ss:ID="Default" ss:Name="Normal">
+      <Alignment ss:Vertical="Center" ss:WrapText="1"/>
+      <Font ss:FontName="Calibri" ss:Size="11" ss:Color="#142018"/>
+    </Style>
+    <Style ss:ID="Title">
+      <Alignment ss:Vertical="Center"/>
+      <Font ss:FontName="Calibri" ss:Size="18" ss:Bold="1" ss:Color="#FFFFFF"/>
+      <Interior ss:Color="#14361A" ss:Pattern="Solid"/>
+    </Style>
+    <Style ss:ID="Subtitle">
+      <Alignment ss:Vertical="Center"/>
+      <Font ss:FontName="Calibri" ss:Size="11" ss:Bold="1" ss:Color="#4F5F56"/>
+      <Interior ss:Color="#E7FF9C" ss:Pattern="Solid"/>
+    </Style>
+    <Style ss:ID="Header">
+      <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
+      <Font ss:FontName="Calibri" ss:Size="11" ss:Bold="1" ss:Color="#FFFFFF"/>
+      <Interior ss:Color="#246A4A" ss:Pattern="Solid"/>
+      <Borders>
+        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#14361A"/>
+      </Borders>
+    </Style>
+    <Style ss:ID="Number">
+      <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+      <Font ss:FontName="Calibri" ss:Size="11" ss:Color="#142018"/>
+      <NumberFormat ss:Format="0"/>
+    </Style>
+  </Styles>
+  <Worksheet ss:Name="Resumen">
+    <Table>
+      <Column ss:AutoFitWidth="0" ss:Width="210" />
+      <Column ss:AutoFitWidth="0" ss:Width="120" />
+      <Column ss:AutoFitWidth="0" ss:Width="260" />
+      ${summarySheetRows}
+    </Table>
+    <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+      <Selected/>
+      <Panes>
+        <Pane>
+          <Number>3</Number>
+          <ActiveRow>1</ActiveRow>
+        </Pane>
+      </Panes>
+    </WorksheetOptions>
+  </Worksheet>
+  <Worksheet ss:Name="Inscripciones">
+    <Table>
+      ${columnDefinitions}
+      ${inscriptionSheetRows}
+    </Table>
+    <AutoFilter x:Range="R4C1:R${registrations.length + 4}C${columns.length}" xmlns="urn:schemas-microsoft-com:office:excel"/>
+    <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+      <FreezePanes/>
+      <FrozenNoSplit/>
+      <SplitHorizontal>4</SplitHorizontal>
+      <TopRowBottomPane>4</TopRowBottomPane>
+      <ActivePane>2</ActivePane>
+    </WorksheetOptions>
+  </Worksheet>
+</Workbook>`;
 }
 
 function setFlash(req, flash) {
@@ -507,15 +687,15 @@ export async function createApp() {
     const filters = getAdminFilters(req);
     const registrations = await listFilteredRegistrations(filters);
     const exportedAt = new Date().toISOString().slice(0, 10);
-    const csv = buildRegistrationsCsv(registrations);
+    const workbook = buildExcelWorkbook(registrations, filters);
 
-    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader("Content-Type", "application/vnd.ms-excel; charset=utf-8");
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="inscripciones-ruta-acordeon-${exportedAt}.csv"`
+      `attachment; filename="inscripciones-ruta-acordeon-${exportedAt}.xls"`
     );
 
-    return res.send(`\uFEFF${csv}`);
+    return res.send(workbook);
   });
 
   app.get("/admin/inscripciones/:id/comprobante", isAuthenticated, async (req, res) => {
