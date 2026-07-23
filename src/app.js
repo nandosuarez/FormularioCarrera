@@ -39,6 +39,8 @@ const receiptMaxSizeMb = Math.max(
   1
 );
 const receiptMaxSizeBytes = receiptMaxSizeMb * 1024 * 1024;
+const registrationsClosed =
+  (process.env.REGISTRATIONS_CLOSED || "true").trim().toLowerCase() !== "false";
 
 function buildStoredFileName(originalName) {
   const extension = path.extname(originalName).toLowerCase();
@@ -88,6 +90,121 @@ function buildApprovedCategorySummary(registrations) {
     total,
     href: `/admin/inscripciones?status=approved&category=${encodeURIComponent(category)}`
   }));
+}
+
+function getQueryValue(value) {
+  return (Array.isArray(value) ? value[0] : value || "").toString().trim();
+}
+
+function getAdminFilters(req) {
+  const rawStatus = getQueryValue(req.query.status) || "all";
+  const allowedStatuses = new Set(["all", "pending", "approved", "rejected"]);
+
+  return {
+    status: allowedStatuses.has(rawStatus) ? rawStatus : "all",
+    query: getQueryValue(req.query.q),
+    category: getQueryValue(req.query.category)
+  };
+}
+
+async function listFilteredRegistrations(filters) {
+  const registrations = await listRegistrations({
+    status: filters.status,
+    query: filters.query
+  });
+
+  if (!filters.category) {
+    return registrations;
+  }
+
+  return registrations.filter((registration) => registration.category === filters.category);
+}
+
+function buildExportHref(filters) {
+  const params = new URLSearchParams();
+
+  if (filters.status && filters.status !== "all") {
+    params.set("status", filters.status);
+  }
+
+  if (filters.query) {
+    params.set("q", filters.query);
+  }
+
+  if (filters.category) {
+    params.set("category", filters.category);
+  }
+
+  const queryString = params.toString();
+  return `/admin/inscripciones/exportar${queryString ? `?${queryString}` : ""}`;
+}
+
+function formatExportDate(dateValue) {
+  if (!dateValue) {
+    return "";
+  }
+
+  const date = new Date(dateValue);
+
+  if (Number.isNaN(date.getTime())) {
+    return dateValue;
+  }
+
+  return new Intl.DateTimeFormat("es-CO", {
+    dateStyle: "medium",
+    timeStyle: "short"
+  }).format(date);
+}
+
+function escapeCsvCell(value) {
+  const text = value === null || value === undefined ? "" : String(value);
+  return `"${text.replaceAll('"', '""')}"`;
+}
+
+function buildRegistrationsCsv(registrations) {
+  const columns = [
+    ["ID", (registration) => registration.id],
+    ["Fecha de inscripción", (registration) => formatExportDate(registration.createdAt)],
+    ["Estado", (registration) => STATUS_LABELS[registration.status] || registration.status],
+    [
+      "Estado correo",
+      (registration) =>
+        EMAIL_STATUS_LABELS[registration.approvalEmailStatus] || registration.approvalEmailStatus
+    ],
+    ["Nombre completo", (registration) => registration.fullName],
+    ["Tipo de documento", (registration) => registration.documentType],
+    ["Número de documento", (registration) => registration.documentNumber],
+    ["Fecha de nacimiento", (registration) => registration.birthDate],
+    ["Edad", (registration) => registration.age],
+    ["Sexo", (registration) => registration.sex],
+    ["Celular", (registration) => registration.phone],
+    ["Correo electrónico", (registration) => registration.email],
+    ["Dirección", (registration) => registration.address],
+    ["Ciudad", (registration) => registration.city],
+    ["Participación", (registration) => registration.participationType],
+    ["Categoría", (registration) => registration.category],
+    ["Grupo sanguíneo", (registration) => registration.bloodType],
+    ["EPS o seguro", (registration) => registration.insurance],
+    ["Condición médica", (registration) => registration.medicalCondition],
+    ["Detalle condición médica", (registration) => registration.medicalDetails],
+    ["Experiencia previa", (registration) => registration.priorRace],
+    ["Contacto emergencia", (registration) => registration.emergencyName],
+    ["Parentesco emergencia", (registration) => registration.emergencyRelationship],
+    ["Teléfono emergencia", (registration) => registration.emergencyPhone],
+    ["Talla camiseta", (registration) => registration.shirtSize],
+    ["Comprobante", (registration) => registration.paymentReceipt?.originalName],
+    ["Fecha aprobación", (registration) => formatExportDate(registration.approvedAt)],
+    ["Fecha correo aprobación", (registration) => formatExportDate(registration.approvalEmailSentAt)],
+    ["Observaciones internas", (registration) => registration.adminNotes],
+    ["Error de correo", (registration) => registration.lastEmailError]
+  ];
+
+  const header = columns.map(([label]) => escapeCsvCell(label)).join(",");
+  const rows = registrations.map((registration) =>
+    columns.map(([, getter]) => escapeCsvCell(getter(registration))).join(",")
+  );
+
+  return `sep=,\r\n${[header, ...rows].join("\r\n")}`;
 }
 
 function setFlash(req, flash) {
@@ -176,6 +293,7 @@ function renderHome(res, { errors = {}, values = {}, status = 200 } = {}) {
     heroTitle: eventPresentation.heroTitle,
     heroYear: eventPresentation.heroYear,
     receiptMaxSizeMb,
+    registrationsClosed,
     todayDate: new Date().toISOString().split("T")[0]
   });
 }
@@ -243,7 +361,22 @@ export async function createApp() {
 
   app.get("/", (_req, res) => renderHome(res));
 
-  app.post("/inscripcion", uploadReceipt, async (req, res) => {
+  app.post(
+    "/inscripcion",
+    (req, res, next) => {
+      if (!registrationsClosed) {
+        return next();
+      }
+
+      setFlash(req, {
+        type: "warning",
+        message: "Las inscripciones están cerradas porque ya no hay cupos disponibles."
+      });
+
+      return res.redirect("/");
+    },
+    uploadReceipt,
+    async (req, res) => {
     const { errors, values, registrationData } = validateRegistrationForm(
       req.body,
       req.file,
@@ -298,7 +431,8 @@ export async function createApp() {
     });
 
     return res.redirect("/");
-  });
+    }
+  );
 
   app.get("/admin", (req, res) => {
     if (req.session.adminId) {
@@ -348,29 +482,40 @@ export async function createApp() {
   });
 
   app.get("/admin/inscripciones", isAuthenticated, async (req, res) => {
-    const status = req.query.status || "all";
-    const query = (req.query.q || "").trim();
-    const category = (req.query.category || "").trim();
-    const [rawRegistrations, summary, approvedRegistrations] = await Promise.all([
-      listRegistrations({ status, query }),
+    const filters = getAdminFilters(req);
+    const [registrations, summary, approvedRegistrations] = await Promise.all([
+      listFilteredRegistrations(filters),
       getRegistrationSummary(),
       listRegistrations({ status: "approved", query: "" })
     ]);
-    const registrations = category
-      ? rawRegistrations.filter((registration) => registration.category === category)
-      : rawRegistrations;
 
     res.render("admin-dashboard", {
       registrations,
       summary,
       approvedCategorySummary: buildApprovedCategorySummary(approvedRegistrations),
       categoryOptions,
-      filters: { status, query, category },
+      exportHref: buildExportHref(filters),
+      filters,
       statusLabels: STATUS_LABELS,
       emailStatusLabels: EMAIL_STATUS_LABELS,
       formatDateTime,
       formatDate
     });
+  });
+
+  app.get("/admin/inscripciones/exportar", isAuthenticated, async (req, res) => {
+    const filters = getAdminFilters(req);
+    const registrations = await listFilteredRegistrations(filters);
+    const exportedAt = new Date().toISOString().slice(0, 10);
+    const csv = buildRegistrationsCsv(registrations);
+
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="inscripciones-ruta-acordeon-${exportedAt}.csv"`
+    );
+
+    return res.send(`\uFEFF${csv}`);
   });
 
   app.get("/admin/inscripciones/:id/comprobante", isAuthenticated, async (req, res) => {
