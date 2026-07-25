@@ -96,11 +96,18 @@
       <% if (registrationsClosed) { %>
         <section class="closed-panel">
           <p class="eyebrow">Inscripciones cerradas</p>
-          <h2>Cupos agotados</h2>
-          <p>
-            Gracias por el interés en la Ruta del Acordeón 10 KM - 2026. En este momento las
-            inscripciones se encuentran cerradas porque ya no hay más cupos disponibles.
-          </p>
+          <h2><%= registrationsLimitReached ? 'Cupo máximo alcanzado' : 'Cupos agotados' %></h2>
+          <% if (registrationsLimitReached) { %>
+            <p>
+              Gracias por el interés en la Ruta del Acordeón 10 KM - 2026. Ya alcanzamos el
+              cupo máximo de <strong><%= registrationCap %></strong> participantes inscritos.
+            </p>
+          <% } else { %>
+            <p>
+              Gracias por el interés en la Ruta del Acordeón 10 KM - 2026. En este momento las
+              inscripciones se encuentran cerradas porque ya no hay más cupos disponibles.
+            </p>
+          <% } %>
           <p>
             Si ya realizaste tu inscripción, el equipo organizador continuará validando la
             información recibida y enviará la confirmación correspondiente.

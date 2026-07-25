@@ -41,6 +41,10 @@ const receiptMaxSizeMb = Math.max(
 const receiptMaxSizeBytes = receiptMaxSizeMb * 1024 * 1024;
 const registrationsClosed =
   (process.env.REGISTRATIONS_CLOSED || "true").trim().toLowerCase() !== "false";
+const registrationCap = Math.max(
+  Number.parseInt(process.env.REGISTRATION_CAP || "160", 10) || 160,
+  1
+);
 
 function buildStoredFileName(originalName) {
   const extension = path.extname(originalName).toLowerCase();
@@ -118,6 +122,23 @@ async function listFilteredRegistrations(filters) {
   }
 
   return registrations.filter((registration) => registration.category === filters.category);
+}
+
+async function getRegistrationCapacityInfo() {
+  const registrations = await listRegistrations({ status: "all", query: "" });
+  const activeRegistrationsCount = registrations.filter(
+    (registration) => registration.status !== "rejected"
+  ).length;
+  const remainingSlots = Math.max(registrationCap - activeRegistrationsCount, 0);
+  const registrationsLimitReached = activeRegistrationsCount >= registrationCap;
+
+  return {
+    activeRegistrationsCount,
+    registrationCap,
+    remainingSlots,
+    registrationsLimitReached,
+    registrationsClosed: registrationsClosed || registrationsLimitReached
+  };
 }
 
 function buildExportHref(filters) {
@@ -458,8 +479,9 @@ function getEventPresentation() {
   };
 }
 
-function renderHome(res, { errors = {}, values = {}, status = 200 } = {}) {
+async function renderHome(res, { errors = {}, values = {}, status = 200 } = {}) {
   const eventPresentation = getEventPresentation();
+  const capacityInfo = await getRegistrationCapacityInfo();
 
   return res.status(status).render("home", {
     errors,
@@ -473,7 +495,7 @@ function renderHome(res, { errors = {}, values = {}, status = 200 } = {}) {
     heroTitle: eventPresentation.heroTitle,
     heroYear: eventPresentation.heroYear,
     receiptMaxSizeMb,
-    registrationsClosed,
+    ...capacityInfo,
     todayDate: new Date().toISOString().split("T")[0]
   });
 }
@@ -539,18 +561,22 @@ export async function createApp() {
     res.status(200).json({ ok: true });
   });
 
-  app.get("/", (_req, res) => renderHome(res));
+  app.get("/", async (_req, res) => renderHome(res));
 
   app.post(
     "/inscripcion",
-    (req, res, next) => {
-      if (!registrationsClosed) {
+    async (req, res, next) => {
+      const capacityInfo = await getRegistrationCapacityInfo();
+
+      if (!capacityInfo.registrationsClosed) {
         return next();
       }
 
       setFlash(req, {
         type: "warning",
-        message: "Las inscripciones están cerradas porque ya no hay cupos disponibles."
+        message: capacityInfo.registrationsLimitReached
+          ? `Las inscripciones están cerradas porque se alcanzó el cupo máximo de ${capacityInfo.registrationCap} participantes.`
+          : "Las inscripciones están cerradas porque ya no hay cupos disponibles."
       });
 
       return res.redirect("/");
@@ -583,6 +609,19 @@ export async function createApp() {
         values,
         status: 422
       });
+    }
+
+    const capacityInfo = await getRegistrationCapacityInfo();
+
+    if (capacityInfo.registrationsClosed) {
+      await removeUploadedFile(req.file);
+      setFlash(req, {
+        type: "warning",
+        message: capacityInfo.registrationsLimitReached
+          ? `No fue posible recibir la inscripción porque se alcanzó el cupo máximo de ${capacityInfo.registrationCap} participantes.`
+          : "Las inscripciones están cerradas porque ya no hay cupos disponibles."
+      });
+      return res.redirect("/");
     }
 
     const storedFileName = buildStoredFileName(req.file.originalname);
